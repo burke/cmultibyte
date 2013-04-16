@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Cmultibyte::VERSION
   spec.authors       = ["Burke Libbey"]
   spec.email         = ["burke@libbey.me"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{ActiveSupport::Multibyte::Unicode.tidy_bytes in C}
+  spec.summary       = %q{ActiveSupport::Multibyte::Unicode.tidy_bytes in C.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -19,6 +19,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.extensions = ["ext/extconf.rb"]
+
+  spec.add_runtime_dependency 'active_support', '~> 3.2.0'
 
   spec.add_development_dependency "bundler", "~> 1.3"
   spec.add_development_dependency "rake"

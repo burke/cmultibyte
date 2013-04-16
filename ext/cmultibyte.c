@@ -92,7 +92,7 @@ static VALUE tidy_bytes(VALUE string) {
   int i, j;
   uint8_t byte;
 
-  uint8_t *arr = ALLOCA_N(uint8_t, 4 * RSTRING_LEN(string));
+  uint8_t *arr = ALLOC_N(uint8_t, 4 * RSTRING_LEN(string));
   uint8_t *curr = arr;
   uint8_t *prev = curr;
   uint8_t *last_lead = curr;
@@ -155,6 +155,7 @@ static VALUE tidy_bytes(VALUE string) {
     }
   }
   VALUE str = rb_str_new((const char *)arr, curr-arr);
+  xfree(arr);
   return str;
 }
 

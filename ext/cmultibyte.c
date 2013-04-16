@@ -197,5 +197,5 @@ void Init_cmultibyte() {
   cp1252_hash_to_array(cp1252_hash);
 
   rb_define_singleton_method(Unicode, "tidy_byte", rb_tidy_byte, 1);
-  rb_define_singleton_method(Unicode, "ctidy_bytes", rb_tidy_bytes, -1);
+  rb_define_singleton_method(Unicode, "tidy_bytes", rb_tidy_bytes, -1);
 }

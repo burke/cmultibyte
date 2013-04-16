@@ -1,6 +1,6 @@
 # Cmultibyte
 
-TODO: Write a gem description
+This reimplements `ActiveSupport::Multibyte::Unicode.tidy_bytes` in C.
 
 ## Installation
 
@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Just require it. It monkeypatches AS.
 
 ## Contributing
 
@@ -27,3 +27,7 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+To run the tests, cd into the activesupport source and run:
+
+`cd /path/to/cmultibyte/ext ; make ; cd - ; bundle exec ruby -I./test -I./lib -r/path/to/cmultibyte/ext/cmultibyte.bundle test/multibyte_*`

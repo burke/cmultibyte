@@ -17,7 +17,7 @@ static int inline is_unused(uint8_t byte)     { return (byte > 240); }
 static int inline is_restricted(uint8_t byte) { return (byte > 244); }
 
 static uint8_t *tidy_byte2(uint8_t byte, uint8_t *dst) {
-  int map;
+  int map, i;
   VALUE ary;
 
   if (byte < 160) {
@@ -29,7 +29,7 @@ static uint8_t *tidy_byte2(uint8_t byte, uint8_t *dst) {
     rb_ary_store(ary, 0, INT2FIX(map));
     ary = rb_funcall(ary, idPack, 1, rb_str_new2("U"));
     ary = rb_funcall(ary, idUnpack, 1, rb_str_new2("C*"));
-    for (int i = 0; i < RARRAY_LEN(ary) ; i++) {
+    for (i = 0; i < RARRAY_LEN(ary) ; i++) {
       dst[i] = FIX2INT(RARRAY_PTR(ary)[i]);
     }
     return dst + RARRAY_LEN(ary);
@@ -76,9 +76,10 @@ VALUE rb_tidy_byte(VALUE self, VALUE byte) {
 }
 
 static void cp1252_hash_to_array(VALUE cp1252_hash) {
+  int i;
   cp1252 = ALLOC_N(int, 256);
   VALUE val;
-  for (int i = 0; i < 256; i++) {
+  for (i = 0; i < 256; i++) {
     val = rb_hash_aref(cp1252_hash, INT2FIX(i));
     if (val == Qnil) {
       cp1252[i] = -1;
@@ -103,7 +104,6 @@ static VALUE protected_tidy_bytes(VALUE arg) {
   uint8_t byte;
 
   uint8_t *curr = arr;
-  uint8_t *prev = curr;
   uint8_t *last_lead = curr;
 
   int did_write = 0;
@@ -128,7 +128,6 @@ static VALUE protected_tidy_bytes(VALUE arg) {
         int start_index = last_lead-arr;
         int end_index = curr-arr;
         int len = end_index - start_index;
-        uint8_t *prev = curr;
 
         uint8_t temp[len];
         for (j = 0; j < len; j++) {
@@ -188,7 +187,8 @@ static VALUE tidy_bytes(VALUE string) {
 static VALUE force_tidy_bytes(VALUE string) {
   uint8_t *arr = malloc(4 * sizeof(uint8_t) * RSTRING_LEN(string));
   uint8_t *curr = arr;
-  for (int i = 0 ; i < RSTRING_LEN(string) ; i++) {
+  int i;
+  for (i = 0 ; i < RSTRING_LEN(string) ; i++) {
     curr = tidy_byte2(RSTRING_PTR(string)[i], curr);
   }
   VALUE str = rb_str_new((const char *)arr, curr - arr);

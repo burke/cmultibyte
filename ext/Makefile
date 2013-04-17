@@ -53,7 +53,7 @@ vendorarchdir = $(vendorlibdir)/$(sitearch)
 
 NULLCMD = :
 
-CC = /usr/bin/cc
+CC = /usr/bin/gcc -Wall
 CXX = g++
 LIBRUBY = $(LIBRUBY_A)
 LIBRUBY_A = lib$(RUBY_SO_NAME)-static.a

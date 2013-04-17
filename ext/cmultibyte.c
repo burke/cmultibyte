@@ -76,7 +76,7 @@ VALUE rb_tidy_byte(VALUE self, VALUE byte) {
 }
 
 static void cp1252_hash_to_array(VALUE cp1252_hash) {
-  cp1252 = malloc(256 * sizeof(int));
+  cp1252 = ALLOC_N(int, 256);
   VALUE val;
   for (int i = 0; i < 256; i++) {
     val = rb_hash_aref(cp1252_hash, INT2FIX(i));

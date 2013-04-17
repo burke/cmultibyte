@@ -9,6 +9,7 @@ int *cp1252;
 
 static ID idUnpack;
 static ID idPack;
+static ID idForceEncoding;
 
 static int inline is_cont(uint8_t byte)       { return (byte > 127 && byte < 192); }
 static int inline is_lead(uint8_t byte)       { return (byte > 191 && byte < 245); }
@@ -87,12 +88,20 @@ static void cp1252_hash_to_array(VALUE cp1252_hash) {
   }
 }
 
-static VALUE tidy_bytes(VALUE string) {
+struct protected_tidy_bytes_arg {
+  VALUE string;
+  uint8_t *arr;
+};
+
+static VALUE protected_tidy_bytes(VALUE arg) {
+  struct protected_tidy_bytes_arg* args = (struct protected_tidy_bytes_arg *)arg;
+  VALUE string = args->string;
+  uint8_t *arr = args->arr;
+
   int conts_expected = 0;
   int i, j;
   uint8_t byte;
 
-  uint8_t *arr = ALLOC_N(uint8_t, 4 * RSTRING_LEN(string));
   uint8_t *curr = arr;
   uint8_t *prev = curr;
   uint8_t *last_lead = curr;
@@ -131,7 +140,6 @@ static VALUE tidy_bytes(VALUE string) {
           curr = tidy_byte2(temp[j], curr);
         }
 
-        //last_lead += (curr-prev);
         conts_expected = 0;
       }
       if (is_lead(byte)) {
@@ -155,9 +163,27 @@ static VALUE tidy_bytes(VALUE string) {
     }
   }
   VALUE str = rb_str_new((const char *)arr, curr-arr);
-  xfree(arr);
-  return str;
+  return rb_funcall(str, idForceEncoding, 1, rb_str_new2("UTF-8"));
 }
+
+static VALUE tidy_bytes(VALUE string) {
+  uint8_t *arr = ALLOC_N(uint8_t, 4 * RSTRING_LEN(string));
+  VALUE ret;
+  int exception = 0;
+  struct protected_tidy_bytes_arg args;
+
+  args.string = string;
+  args.arr = arr;
+
+  ret = rb_protect(protected_tidy_bytes, (VALUE)&args, &exception);
+
+  xfree(arr);
+  if (exception) {
+    rb_jump_tag(exception);
+  }
+  return ret;
+}
+
 
 static VALUE force_tidy_bytes(VALUE string) {
   uint8_t *arr = malloc(4 * sizeof(uint8_t) * RSTRING_LEN(string));
@@ -184,6 +210,7 @@ VALUE rb_tidy_bytes(int argc, VALUE *argv, VALUE self) {
 void Init_cmultibyte() {
   idUnpack = rb_intern("unpack");
   idPack = rb_intern("pack");
+  idForceEncoding = rb_intern("force_encoding");
 
   rb_funcall(rb_cObject, rb_intern("require"), 1, rb_str_new2("active_support/all"));
 

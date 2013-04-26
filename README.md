@@ -2,6 +2,8 @@
 
 This reimplements `ActiveSupport::Multibyte::Unicode.tidy_bytes` in C.
 
+It turns out that [this patch](https://github.com/rails/rails/pull/10355) actually works even better. So don't use this gem.
+
 ## Installation
 
 Add this line to your application's Gemfile:
